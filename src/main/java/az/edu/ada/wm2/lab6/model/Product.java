@@ -1,13 +1,19 @@
 package az.edu.ada.wm2.lab6.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -20,7 +26,14 @@ public class Product {
     private BigDecimal price;
     private LocalDate expirationDate;
 
-    // Constructors
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "product_categories",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
+
     public Product() {
     }
 
@@ -37,7 +50,21 @@ public class Product {
         this.expirationDate = expirationDate;
     }
 
-    // Getters and Setters
+    public Product(String productName, BigDecimal price, LocalDate expirationDate, Set<Category> categories) {
+        this.productName = productName;
+        this.price = price;
+        this.expirationDate = expirationDate;
+        this.categories = categories;
+    }
+
+    public Product(UUID id, String productName, BigDecimal price, LocalDate expirationDate, Set<Category> categories) {
+        this.id = id;
+        this.productName = productName;
+        this.price = price;
+        this.expirationDate = expirationDate;
+        this.categories = categories;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -68,6 +95,14 @@ public class Product {
 
     public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
     }
 
     @Override
